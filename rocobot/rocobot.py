@@ -1,10 +1,24 @@
 import discord
 from discord.ext import commands
 
-import sys, traceback
+import sys, traceback, os
 
 BOT_PREFIX = '&'
-TOKEN = 'INSERT TOKEN HERE'
+
+TOKEN_LOCATION = 'api-token.txt'
+TOKEN = ''
+
+# Access the API token if it exists
+if os.path.exists(TOKEN_LOCATION):
+    with open(TOKEN_LOCATION, 'r') as file:
+        TOKEN = file.read().strip()
+        file.close()
+# Otherwise prompt for the API token and store it
+else:
+    TOKEN = input("Please enter the API token:").strip()
+    with open(TOKEN_LOCATION, 'w') as file:
+        file.write(TOKEN)
+        file.close()
 
 # Set the command prefix here
 bot = commands.Bot(command_prefix=BOT_PREFIX)
