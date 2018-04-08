@@ -32,7 +32,7 @@ class Fun:
         if lengthoarms > 90:
             lengthoarms = 90
         if lengtholegs > 50:
-            lengtholegs = 50    
+            lengtholegs = 50
         dinosaur_str = ''
         dinosaur_str += ('___________ \n')
         dinosaur_str += ("|          |\n")
