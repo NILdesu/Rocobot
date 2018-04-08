@@ -27,5 +27,29 @@ class Fun:
         embed.set_image(url=roco)
         await ctx.send(embed=embed)
 
+    @commands.command(name='rawr')
+    async def print_dinosaur(self, ctx, lengthoarms: int, lengtholegs: int):
+        if lengthoarms > 90:
+            lengthoarms = 90
+        if lengtholegs > 50:
+            lengtholegs = 50    
+        dinosaur_str = ''
+        dinosaur_str += ('___________ \n')
+        dinosaur_str += ("|          |\n")
+        dinosaur_str += ('|        o |\n')
+        dinosaur_str += ('|   _______|\n')
+        dinosaur_str += ('|  |_______ \n')
+        dinosaur_str += ('|__________|\n')
+        dinosaur_str += ('|\n')
+        for x in range(0, lengthoarms):
+            dinosaur_str += ('=')
+        dinosaur_str += ('|\n')
+
+        for x in range(0, lengtholegs):
+            dinosaur_str += ("|\n")
+
+        dinosaur_str += ('=====')
+        await ctx.send(f'```{dinosaur_str}```')
+
 def setup(bot):
     bot.add_cog(Fun(bot))
