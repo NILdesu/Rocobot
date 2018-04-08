@@ -25,7 +25,7 @@ class Lemons:
     ###########################################################################
     # BOT COMMANDS
     ###########################################################################
-    # displays the amount of lemons a user has
+    # Displays the amount of lemons a user has
     @commands.command(name='lemons', description='lemonade')
     async def lemons(self, ctx):
         username = ctx.message.author
@@ -38,11 +38,11 @@ class Lemons:
         userinv = self.inventory[userid]
 
         num_lemons = self.get_lemons_text(userinv['lemons'])
-        await ctx.send(f':lemon: {username.mention}: You have {num_lemons} :lemon:')
+        await ctx.send(f':lemon: {username.mention} You have {num_lemons} :lemon:')
 
-    # adds a single lemon to user's inventory
-    @commands.command(name='pick', description='get more lemons')
-    async def get_lemon(self,ctx):
+
+    @commands.command(name='mine', description='get more lemons')
+    async def mine(self, ctx):
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
@@ -50,14 +50,72 @@ class Lemons:
 
         userinv = self.inventory[userid]
 
-        userinv['lemons'] += 1
+        if userinv['picks'] == 0:
+            await ctx.send(f'{username.mention} You don\'t have any pickaxes! Buy one first')
+
+        else:
+            # Use double roll rng to determine whether the pick breaks
+            if((random.randint(0, 100) + random.randint(0, 100)) / 2 < userinv['break_chance']):
+                await ctx.send(f'{username.mention} Your pickaxe broke!')
+                userinv['picks'] -= 1
+                userinv['break_chance'] = 0
+
+            else:
+                lemons_gained = random.randint(3, 10)
+                userinv['lemons'] += lemons_gained
+                userinv['break_chance'] = 60 if userinv['break_chance'] == 60 else userinv['break_chance'] + 10
+                lemon_str = self.get_lemons_text(userinv['lemons'])
+                await ctx.send(f':lemon: {username.mention} You mined {lemons_gained} lemons. You now have {lemon_str} :lemon:')
+
+
         with open(INVENTORY_LOCATION, 'w') as file:
             file.write(json.dumps(self.inventory))
 
-        num_lemons = self.get_lemons_text(userinv['lemons'])
-        await ctx.send(f':lemon: {username.mention}: You picked one lemon. You now have {num_lemons} :lemon:')
+    # Rudimentary market support.
+    # Currently only supports buying picks
+    @commands.command(name='buy')
+    async def buy(self, ctx):
+        username = ctx.message.author
+        userid = str(username.id)
+        if userid not in self.inventory.keys():
+            self.inventory[userid] = self.create_empty_inventory()
+        userinv = self.inventory[userid]
 
-    # rolls the slots to win lemons
+        if userinv['lemons'] < 20 and userinv['picks'] == 0:
+            await ctx.send("You seem to be starting out. Here's a pickaxe for free")
+            await ctx.send("You got a pickaxe, free of charge!")
+
+        elif userinv['lemons'] < 20 and userinv['picks'] > 0:
+            await ctx.send("You can't afford this!")
+
+        else:
+            userinv['lemons'] -= 20;
+            await ctx.send("You bought one pickaxe for 20 lemons")
+
+        userinv['picks'] += 1;
+        with open(INVENTORY_LOCATION, 'w') as file:
+            file.write(json.dumps(self.inventory))
+
+    @commands.command(name='inventory', aliases=['inv'])
+    async def display_inventory(self, ctx):
+        username = ctx.message.author
+        userid = str(username.id)
+        if userid not in self.inventory.keys():
+            self.inventory[userid] = self.create_empty_inventory()
+        userinv = self.inventory[userid]
+
+        embed = discord.Embed(title=f'{username}\'s Inventory', color=discord.Colour.gold())
+
+        lemons = userinv['lemons']
+        picks = userinv['picks']
+
+        embed.add_field(name=f':lemon: Lemon x {lemons}', value='\u200B', inline=False)
+        embed.add_field(name=f':pick: Pickaxe x {picks}', value='\u200B', inline=False)
+
+        await ctx.send(embed=embed)
+
+
+    # Rolls the slots to win lemons
     @commands.command(name='slots', description='roco themed slot machine')
     async def spin_slots(self, ctx):
         message_parts = []
@@ -133,6 +191,7 @@ class Lemons:
         inv = {}
         inv['lemons'] = 0;
         inv['picks'] = 0;
+        inv['break_chance'] = 0;
         return inv
 
 def setup(bot):
