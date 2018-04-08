@@ -51,15 +51,16 @@ class Lemons:
             await ctx.send(f'{username.mention} You don\'t have any pickaxes! Buy one first')
 
         else:
-            if(random.randint(0, 100) < userinv['break_chance']):
+            # Use double roll rng to determine whether the pick breaks
+            if((random.randint(0, 100) + random.randint(0, 100)) / 2 < userinv['break_chance']):
                 await ctx.send(f'{username.mention} Your pickaxe broke!')
                 userinv['picks'] -= 1
                 userinv['break_chance'] = 0
 
             else:
-                lemons_gained = random.randint(3, 7)
+                lemons_gained = random.randint(3, 10)
                 userinv['lemons'] += lemons_gained
-                userinv['break_chance'] = 50 if userinv['break_chance'] == 50 else userinv['break_chance'] + 10
+                userinv['break_chance'] = 60 if userinv['break_chance'] == 60 else userinv['break_chance'] + 10
                 lemon_str = self.get_lemons_text(userinv['lemons'])
                 await ctx.send(f':lemon: {username.mention} You mined {lemons_gained} lemons. You now have {lemon_str} :lemon:')
 
@@ -89,6 +90,8 @@ class Lemons:
             await ctx.send("You bought one pickaxe for 20 lemons")
 
         userinv['picks'] += 1;
+        with open(INVENTORY_LOCATION, 'w') as file:
+            file.write(json.dumps(self.inventory))
 
     @commands.command(name='inventory', aliases=['inv'])
     async def display_inventory(self, ctx):
