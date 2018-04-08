@@ -40,6 +40,10 @@ class Owner:
         else:
             await ctx.send('**`SUCCESS`**')
 
+    @commands.command(name='exit', hidden=True)
+    @commands.is_owner()
+    async def quit_bot(self, ctx):
+        await self.bot.logout()
 
 # setup the cog
 def setup(bot):
