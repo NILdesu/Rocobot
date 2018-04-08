@@ -3,24 +3,20 @@ from discord.ext import commands
 from enum import Enum
 from discord.ext.commands.cooldowns import BucketType
 
+import util
+from util import io
+
 import json, random, os
 
-INVENTORY_DIR = 'inventory'
-INVENTORY_LOCATION = f'{INVENTORY_DIR}/inventory.json'
+INVENTORY_LOCATION = 'inventory/inventory.json'
 class Lemons:
     def __init__(self, bot):
         self.bot = bot
 
-        self.inventory = {}
-        if os.path.exists(INVENTORY_LOCATION):
-            with open(INVENTORY_LOCATION, 'r') as file:
-                read_data = file.read()
-                self.inventory = json.loads(read_data)
-        else:
-            if not os.path.exists(INVENTORY_DIR):
-                os.makedirs(INVENTORY_DIR)
-            with open(INVENTORY_LOCATION, 'w') as file:
-                file.write(json.dumps(self.inventory))
+        self.inventory = util.io.read_json(INVENTORY_LOCATION)
+        if (self.inventory == None):
+            self.inventory = {}
+            util.io.write_json(INVENTORY_LOCATION, self.inventory)
 
         random.seed()
 
@@ -33,9 +29,8 @@ class Lemons:
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
-            self.inventory[userid] = self.create_empty_inventory()
-            with open(INVENTORY_LOCATION, 'w') as file:
-                file.write(json.dumps(self.inventory))
+            self.inventory[userid] = util.create_empty_inventory()
+            util.io.write_json(INVENTORY_LOCATION, self.inventory)
 
         userinv = self.inventory[userid]
 
@@ -52,8 +47,7 @@ class Lemons:
         self.inventory[str(ctx.message.author.id)]['lemons'] += 5
         await ctx.send(f':lemon: {ctx.message.author.mention} You got your daily reward! Here\'s 5 lemons')
 
-        with open(INVENTORY_LOCATION, 'w') as file:
-            file.write(json.dumps(self.inventory))
+        util.io.write_json(INVENTORY_LOCATION, self.inventory)
 
     @daily.error
     async def daily_error_handler(self, ctx, error):
@@ -67,7 +61,7 @@ class Lemons:
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
-            self.inventory[userid] = self.create_empty_inventory()
+            self.inventory[userid] = util.create_empty_inventory()
 
         userinv = self.inventory[userid]
 
@@ -88,9 +82,7 @@ class Lemons:
                 lemon_str = self.get_lemons_text(userinv['lemons'])
                 await ctx.send(f':lemon: {username.mention} You mined {lemons_gained} lemons. You now have {lemon_str} :lemon:')
 
-
-        with open(INVENTORY_LOCATION, 'w') as file:
-            file.write(json.dumps(self.inventory))
+        util.io.write_json(INVENTORY_LOCATION, self.inventory)
 
     # Rudimentary market support.
     # Currently only supports buying picks
@@ -99,7 +91,7 @@ class Lemons:
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
-            self.inventory[userid] = self.create_empty_inventory()
+            self.inventory[userid] = util.create_empty_inventory()
         userinv = self.inventory[userid]
 
         if userinv['lemons'] < 20 and userinv['picks'] == 0:
@@ -114,15 +106,14 @@ class Lemons:
             await ctx.send("You bought one pickaxe for 20 lemons")
 
         userinv['picks'] += 1;
-        with open(INVENTORY_LOCATION, 'w') as file:
-            file.write(json.dumps(self.inventory))
+        util.io.write_json(INVENTORY_LOCATION, self.inventory)
 
     @commands.command(name='inventory', aliases=['inv'])
     async def display_inventory(self, ctx):
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
-            self.inventory[userid] = self.create_empty_inventory()
+            self.inventory[userid] = util.create_empty_inventory()
         userinv = self.inventory[userid]
 
         embed = discord.Embed(title=f'{username}\'s Inventory', color=discord.Colour.gold())
@@ -143,7 +134,7 @@ class Lemons:
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
-            self.inventory[userid] = self.create_empty_inventory
+            self.inventory[userid] = util.create_empty_inventory()
 
         userinv = self.inventory[userid]
         # Build the slots
@@ -179,8 +170,7 @@ class Lemons:
 
         # Add lemons to the inventory
         userinv['lemons'] += num_lemons
-        with open(INVENTORY_LOCATION, 'w') as file:
-            file.write(json.dumps(self.inventory))
+        util.io.write_json(INVENTORY_LOCATION, self.inventory)
 
         # Add the inventory to the message
         inventory_lemons = self.get_lemons_text(userinv['lemons'])
@@ -207,17 +197,10 @@ class Lemons:
             return '1 lemon'
         return f'{num_lemons} lemons'
 
-    # returns a new empty inventory to be passed to a json file
-    def create_empty_inventory(self):
-        inv = {}
-        inv['lemons'] = 0
-        inv['picks'] = 0
-        inv['break_chance'] = 0
-        return inv
 
     def inventory_check(self, userid):
         if userid not in self.inventory.keys():
-            self.inventory[userid] = self.create_empty_inventory()
+            self.inventory[userid] = util.create_empty_inventory()
 
 def setup(bot):
     bot.add_cog(Lemons(bot))
