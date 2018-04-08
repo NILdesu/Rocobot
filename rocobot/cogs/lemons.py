@@ -1,65 +1,69 @@
 import discord
 from discord.ext import commands
-import json
-import random
 
+import json, random, os
+
+INVENTORY_LOCATION = 'inventory/inventory.json'
 class Lemons:
     def __init__(self, bot):
         self.bot = bot
 
-        self.inventory = {};
-        with open('inventory/inventory.json', 'r') as file:
-            read_data = file.read()
-            self.inventory = json.loads(read_data)
+        self.inventory = {}
+        if os.path.exists(INVENTORY_LOCATION):
+            with open(INVENTORY_LOCATION, 'r') as file:
+                read_data = file.read()
+                self.inventory = json.loads(read_data)
+        else:
+            with open(INVENTORY_LOCATION, 'w') as file:
+                file.write("")
 
         random.seed()
 
-    # Returns a random thing that Roco likes
-    def random_roco_thing(self):
-        roco_things = [':lemon:', ':sheep:', ':paintbrush:', ':art:', ':headphones:', ':dress:']
-        return roco_things[random.randint(0, len(roco_things) - 1)]
-
-    # Returns a grammatically correct count of lemons
-    def get_lemons_text(self, num_lemons):
-        if (num_lemons == 1):
-            return '1 lemon'
-        return f'{num_lemons} lemons'
-
-
+    ###########################################################################
+    # BOT COMMANDS
+    ###########################################################################
+    # displays the amount of lemons a user has
     @commands.command(name='lemons', description='lemonade')
     async def lemons(self, ctx):
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
-            self.inventory[userid] = 0
-            with open('inventory/inventory.json', 'w') as file:
+            self.inventory[userid] = self.create_empty_inventory()
+            with open(INVENTORY_LOCATION, 'w') as file:
                 file.write(json.dumps(self.inventory))
 
-        num_lemons = self.get_lemons_text(self.inventory[userid])
+        userinv = self.inventory[userid]
+
+        num_lemons = self.get_lemons_text(userinv['lemons'])
         await ctx.send(f':lemon: {username.mention}: You have {num_lemons} :lemon:')
 
+    # adds a single lemon to user's inventory
     @commands.command(name='pick', description='get more lemons')
     async def get_lemon(self,ctx):
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
-            self.inventory[userid] = 0
+            self.inventory[userid] = self.create_empty_inventory()
 
-        self.inventory[userid] += 1
-        with open('inventory/inventory.json', 'w') as file:
+        userinv = self.inventory[userid]
+
+        userinv['lemons'] += 1
+        with open(INVENTORY_LOCATION, 'w') as file:
             file.write(json.dumps(self.inventory))
 
-        num_lemons = self.get_lemons_text(self.inventory[userid])
+        num_lemons = self.get_lemons_text(userinv['lemons'])
         await ctx.send(f':lemon: {username.mention}: You picked one lemon. You now have {num_lemons} :lemon:')
 
+    # rolls the slots to win lemons
     @commands.command(name='slots', description='roco themed slot machine')
     async def spin_slots(self, ctx):
         message_parts = []
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
-            self.inventory[userid] = 0
+            self.inventory[userid] = self.create_empty_inventory
 
+        userinv = self.inventory[userid]
         # Build the slots
         slots = []
         for i in range(0, 3):
@@ -92,12 +96,12 @@ class Lemons:
         message_parts.append(f':lemon: You won {score_lemons} :lemon:')
 
         # Add lemons to the inventory
-        self.inventory[userid] += num_lemons
-        with open('inventory/inventory.json', 'w') as file:
+        userinv['lemons'] += num_lemons
+        with open(INVENTORY_LOCATION, 'w') as file:
             file.write(json.dumps(self.inventory))
 
         # Add the inventory to the message
-        inventory_lemons = self.get_lemons_text(self.inventory[userid])
+        inventory_lemons = self.get_lemons_text(userinv['lemons'])
         message_parts.append(f':lemon: You now have {inventory_lemons} :lemon:')
 
         # Embed the message and then send
@@ -107,6 +111,26 @@ class Lemons:
         embed.add_field(name='\u200B', value='\n'.join(message_parts), inline=False)
         await ctx.send(embed=embed)
 
+    ###########################################################################
+    # HELPER FUNCTIONS
+    ###########################################################################
+    # Returns a random thing that Roco likes
+    def random_roco_thing(self):
+        roco_things = [':lemon:', ':sheep:', ':paintbrush:', ':art:', ':headphones:', ':dress:']
+        return roco_things[random.randint(0, len(roco_things) - 1)]
+
+    # Returns a grammatically correct count of lemons
+    def get_lemons_text(self, num_lemons):
+        if (num_lemons == 1):
+            return '1 lemon'
+        return f'{num_lemons} lemons'
+
+    # returns a new empty inventory to be passed to a json file
+    def create_empty_inventory(self):
+        inv = {}
+        inv['lemons'] = 0;
+        inv['picks'] = 0;
+        return inv
 
 def setup(bot):
     bot.add_cog(Lemons(bot))
