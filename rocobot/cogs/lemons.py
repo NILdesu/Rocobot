@@ -100,7 +100,7 @@ class Lemons:
         inventory_lemons = self.get_lemons_text(self.inventory[userid])
         message_parts.append(f':lemon: You now have {inventory_lemons} :lemon:')
 
-        # Embed the message and then send 
+        # Embed the message and then send
         embed = discord.Embed(color=discord.Colour.gold())
         await ctx.send(username.mention)
         embed.add_field(name='Slots', value=pretty_slots, inline=False)
