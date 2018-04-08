@@ -4,7 +4,7 @@ from discord.ext import commands
 import sys, traceback
 
 BOT_PREFIX = '&'
-TOKEN = 'NDMyMDgzOTI0NjI2MTc4MDQ4.Dar3Hg.lQrHuinPwjyxXbZvfOoZ6CRE6LA'
+TOKEN = 'PUT TOKEN HERE'
 
 # Set the command prefix here
 bot = commands.Bot(command_prefix=BOT_PREFIX)
