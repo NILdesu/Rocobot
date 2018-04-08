@@ -1,5 +1,7 @@
 import discord
 from discord.ext import commands
+from enum import Enum
+from discord.ext.commands.cooldowns import BucketType
 
 import json, random, os
 
@@ -36,6 +38,25 @@ class Lemons:
 
         num_lemons = self.get_lemons_text(userinv['lemons'])
         await ctx.send(f':lemon: {username.mention} You have {num_lemons} :lemon:')
+
+    @commands.command(name='daily', description='Get a lemon reward once a day')
+    @commands.cooldown(rate=1, per=30, type=BucketType.user)
+    async def daily(self, ctx):
+        username = ctx.message.author
+        userid = str(username.id)
+        self.inventory_check(userid)
+
+        self.inventory[str(ctx.message.author.id)]['lemons'] += 5
+        await ctx.send(f':lemon: {ctx.message.author.mention} You got your daily reward! Here\'s 5 lemons')
+
+        with open(INVENTORY_LOCATION, 'w') as file:
+            file.write(json.dumps(self.inventory))
+
+    @daily.error
+    async def daily_error_handler(self, ctx, error):
+        # Check if our required argument inp is missing.
+        if type(error) is commands.CommandOnCooldown:
+            await ctx.send('cooldown boy')
 
 
     @commands.command(name='mine', description='get more lemons')
@@ -186,10 +207,14 @@ class Lemons:
     # returns a new empty inventory to be passed to a json file
     def create_empty_inventory(self):
         inv = {}
-        inv['lemons'] = 0;
-        inv['picks'] = 0;
-        inv['break_chance'] = 0;
+        inv['lemons'] = 0
+        inv['picks'] = 0
+        inv['break_chance'] = 0
         return inv
+
+    def inventory_check(self, userid):
+        if userid not in self.inventory.keys():
+            self.inventory[userid] = self.create_empty_inventory()
 
 def setup(bot):
     bot.add_cog(Lemons(bot))
