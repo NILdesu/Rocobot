@@ -4,13 +4,14 @@ from discord.ext import commands
 import sys, traceback
 
 BOT_PREFIX = '&'
-TOKEN = 'INSERT TOKEN HERE'
+TOKEN = 'PUT TOKEN HERE'
 
 # Set the command prefix here
 bot = commands.Bot(command_prefix=BOT_PREFIX)
 initial_extensions = ['cogs.fun',
                       'cogs.owner',
-                      'cogs.members']
+                      'cogs.members',
+                      'cogs.lemons']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
