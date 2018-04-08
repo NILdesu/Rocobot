@@ -18,7 +18,7 @@ class Lemons:
             if not os.path.exists(INVENTORY_DIR):
                 os.makedirs(INVENTORY_DIR)
             with open(INVENTORY_LOCATION, 'w') as file:
-                file.write("")
+                file.write(json.dumps(self.inventory))
 
         random.seed()
 
