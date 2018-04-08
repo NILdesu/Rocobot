@@ -24,7 +24,8 @@ bot = commands.Bot(command_prefix=BOT_PREFIX)
 initial_extensions = ['cogs.fun',
                       'cogs.owner',
                       'cogs.members',
-                      'cogs.lemons']
+                      'cogs.lemons',
+                      'cogs.utility']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
