@@ -1,2 +1,4 @@
 rocobot/cogs/__pycache__
+rocobot/inventory/
 rocobot/inventory/inventory.json
+rocobot/data/api-token.txt
