@@ -1,16 +1,18 @@
 import discord
 from discord.ext import commands
 
+import util
+from util import io
+
 import json, random
+
+ROCO_CARDS_LOCATION = 'data/roco-cards.json'
 
 class Fun:
     def __init__(self, bot):
         self.bot = bot
 
-        self.rocos = []
-        with open('data/roco-cards.json', 'r') as file:
-            read_data = file.read()
-            self.rocos = json.loads(read_data)
+        self.rocos = util.io.read_json(ROCO_CARDS_LOCATION)
 
         random.seed()
 
@@ -21,6 +23,10 @@ class Fun:
 
     @commands.command(name='spot', description='spot a roco')
     async def spot_a_roco(self, ctx):
+        if (self.rocos == None):
+            embed = discord.Embed(title='No Roco Spotted :disappointed:')
+            await ctx.send(embed=embed)
+
         roco = self.rocos[random.randint(0, len(self.rocos))]
 
         embed = discord.Embed(title='Roco Spotted!', color=discord.Colour.gold())
