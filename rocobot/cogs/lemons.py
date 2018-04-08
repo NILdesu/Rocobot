@@ -3,7 +3,8 @@ from discord.ext import commands
 
 import json, random, os
 
-INVENTORY_LOCATION = 'inventory/inventory.json'
+INVENTORY_DIR = 'inventory'
+INVENTORY_LOCATION = f'{INVENTORY_DIR}/inventory.json'
 class Lemons:
     def __init__(self, bot):
         self.bot = bot
@@ -14,6 +15,8 @@ class Lemons:
                 read_data = file.read()
                 self.inventory = json.loads(read_data)
         else:
+            if not os.path.exists(INVENTORY_DIR):
+                os.makedirs(INVENTORY_DIR)
             with open(INVENTORY_LOCATION, 'w') as file:
                 file.write("")
 
