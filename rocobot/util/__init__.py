@@ -1,6 +1,6 @@
 import os
 
-__all__ = ['io']
+__all__ = ['io', 'shows']
 
 # returns a new empty inventory to be passed to a json file
 def create_empty_inventory():

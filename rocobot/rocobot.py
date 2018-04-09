@@ -25,7 +25,8 @@ initial_extensions = ['cogs.fun',
                       'cogs.owner',
                       'cogs.members',
                       'cogs.lemons',
-                      'cogs.error_handler']
+                      'cogs.error_handler',
+                      'cogs.utility']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
