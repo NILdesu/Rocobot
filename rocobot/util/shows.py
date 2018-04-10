@@ -25,21 +25,27 @@ async def _shows_help(ctx):
 
 async def _shows_add(shows, ctx, title):
     await ctx.send(f'add {title}')
+    _store_shows_data(shows)
 
 async def _shows_remove(shows, ctx, title):
     await ctx.send(f'remove {title}')
+    _store_shows_data(shows)
 
 async def _shows_join(shows, ctx, title):
     await ctx.send(f'join {title}')
+    _store_shows_data(shows)
 
 async def _shows_leave(shows, ctx, title):
     await ctx.send(f'leave {title}')
+    _store_shows_data(shows)
 
 async def _shows_invite(shows, ctx, user, title):
     await ctx.send(f'invite {user} {title}')
+    _store_shows_data(shows)
 
 async def _shows_kick(shows, ctx, user, title):
     await ctx.send(f'kick {user} {title}')
+    _store_shows_data(shows)
 
 async def _shows_recommend(shows, ctx):
     await ctx.send(f'recommend')
@@ -56,7 +62,6 @@ async def handle_command(ctx, args):
         return
 
     subcommand = args[0]
-
 
     if subcommand == 'help':
         await _shows_help(ctx)
