@@ -7,8 +7,6 @@ from util import io
 
 import json, random, os
 
-from datetime import datetime
-
 INVENTORY_LOCATION = 'inventory/inventory.json'
 class Lemons:
     """ Lemons Commands
