@@ -9,20 +9,23 @@ import json, random
 ROCO_CARDS_LOCATION = 'data/roco-cards.json'
 
 class Fun:
+    """ Fun Commands
+
+    Commands that have no real purpose other than fun
+    """
     def __init__(self, bot):
         self.bot = bot
-
         self.rocos = util.io.read_json(ROCO_CARDS_LOCATION)
-
         random.seed()
 
-    # shabadaba: yup
-    @commands.command(name='shabadaba', description='Exactly what it sounds like')
+    @commands.command(name='shabadaba', brief='\u200B')
     async def shabadaba(self, ctx):
+        """ Prints out a fun roco face """
         await ctx.send('(⋈•̀ᴗ•́⋈)')
 
-    @commands.command(name='spot', description='spot a roco')
+    @commands.command(name='spot', brief='\u200B')
     async def spot_a_roco(self, ctx):
+        """ Display a random roco picture """
         if (self.rocos == None):
             embed = discord.Embed(title='No Roco Spotted :disappointed:')
             await ctx.send(embed=embed)
@@ -33,8 +36,15 @@ class Fun:
         embed.set_image(url=roco)
         await ctx.send(embed=embed)
 
-    @commands.command(name='rawr')
+    @commands.command(name='rawr', brief='\u200B')
     async def print_dinosaur(self, ctx, lengthoarms: int, lengtholegs: int):
+        """ Display a dinosaur with varying proportions
+
+        Attributes
+        -----------
+        lengthoarms: The length of arms for the dinosaur
+        lengtholegs: The length of legs for the dinosaur
+        """
         if lengthoarms > 90:
             lengthoarms = 90
         if lengtholegs > 50:

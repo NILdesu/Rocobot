@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from enum import Enum
 from discord.ext.commands.cooldowns import BucketType
 
 import util
@@ -8,8 +7,14 @@ from util import io
 
 import json, random, os
 
+from datetime import datetime
+
 INVENTORY_LOCATION = 'inventory/inventory.json'
 class Lemons:
+    """ Lemons Commands
+
+    Commands related to the currency (lemons) or inventory
+    """
     def __init__(self, bot):
         self.bot = bot
 
@@ -23,9 +28,9 @@ class Lemons:
     ###########################################################################
     # BOT COMMANDS
     ###########################################################################
-    # Displays the amount of lemons a user has
-    @commands.command(name='lemons', description='lemonade')
+    @commands.command(name='lemons', brief='\u200B')
     async def lemons(self, ctx):
+        """ Displays the amount of lemons a user has"""
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
@@ -37,27 +42,52 @@ class Lemons:
         num_lemons = self.get_lemons_text(userinv['lemons'])
         await ctx.send(f':lemon: {username.mention} You have {num_lemons} :lemon:')
 
-    @commands.command(name='daily', description='Get a lemon reward once a day')
-    @commands.cooldown(rate=1, per=30, type=BucketType.user)
+    @commands.command(name='inventory', aliases=['inv'], brief='\u200B')
+    async def display_inventory(self, ctx):
+        """ Show the user's inventory
+
+        Aliases: inv
+        """
+        username = ctx.message.author
+        userid = str(username.id)
+        if userid not in self.inventory.keys():
+            self.inventory[userid] = util.create_empty_inventory()
+        userinv = self.inventory[userid]
+
+        embed = discord.Embed(title=f'{username}\'s Inventory', color=discord.Colour.gold())
+
+        lemons = userinv['lemons']
+        picks = userinv['picks']
+
+        embed.add_field(name=f':lemon: Lemon x {lemons}', value='\u200B', inline=False)
+        embed.add_field(name=f':pick: Pickaxe x {picks}', value='\u200B', inline=False)
+
+        await ctx.send(embed=embed)
+
+    @commands.command(name='daily', brief='\u200B')
+    @commands.cooldown(rate=1, per=86400, type=BucketType.user)
     async def daily(self, ctx):
+        """ Gives the user a daily lemon reward
+
+        Cooldown of 24 hours
+        """
         username = ctx.message.author
         userid = str(username.id)
         self.inventory_check(userid)
 
         self.inventory[str(ctx.message.author.id)]['lemons'] += 5
-        await ctx.send(f':lemon: {ctx.message.author.mention} You got your daily reward! Here\'s 5 lemons')
+        await ctx.send(f':lemon: {ctx.message.author.mention} You got your daily reward! Here\'s 5 lemons :lemon:')
 
         util.io.write_json(INVENTORY_LOCATION, self.inventory)
 
-    @daily.error
-    async def daily_error_handler(self, ctx, error):
-        # Check if our required argument inp is missing.
-        if type(error) is commands.CommandOnCooldown:
-            await ctx.send('cooldown boy')
 
-
-    @commands.command(name='mine', description='get more lemons')
+    @commands.command(name='mine', brief='\u200B')
+    @commands.cooldown(rate=1, per=300, type=BucketType.user)
     async def mine(self, ctx):
+        """ Mine for lemons
+
+        Cooldown of 5 minutes
+        """
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
@@ -67,6 +97,7 @@ class Lemons:
 
         if userinv['picks'] == 0:
             await ctx.send(f'{username.mention} You don\'t have any pickaxes! Buy one first')
+            ctx.command.reset_cooldown(ctx)
 
         else:
             # Use double roll rng to determine whether the pick breaks
@@ -84,10 +115,13 @@ class Lemons:
 
         util.io.write_json(INVENTORY_LOCATION, self.inventory)
 
-    # Rudimentary market support.
-    # Currently only supports buying picks
-    @commands.command(name='buy')
+
+    @commands.command(name='buy', brief='\u200B')
     async def buy(self, ctx):
+        """ Buy things from the market
+
+        Currently can only buy pickaxes
+        """
         username = ctx.message.author
         userid = str(username.id)
         if userid not in self.inventory.keys():
@@ -95,7 +129,7 @@ class Lemons:
         userinv = self.inventory[userid]
 
         if userinv['lemons'] < 20 and userinv['picks'] == 0:
-            await ctx.send("You seem to be starting out. Here's a pickaxe for free")
+            await ctx.send("You seem to be down on your luck.")
             await ctx.send("You got a pickaxe, free of charge!")
 
         elif userinv['lemons'] < 20 and userinv['picks'] > 0:
@@ -108,28 +142,12 @@ class Lemons:
         userinv['picks'] += 1;
         util.io.write_json(INVENTORY_LOCATION, self.inventory)
 
-    @commands.command(name='inventory', aliases=['inv'])
-    async def display_inventory(self, ctx):
-        username = ctx.message.author
-        userid = str(username.id)
-        if userid not in self.inventory.keys():
-            self.inventory[userid] = util.create_empty_inventory()
-        userinv = self.inventory[userid]
-
-        embed = discord.Embed(title=f'{username}\'s Inventory', color=discord.Colour.gold())
-
-        lemons = userinv['lemons']
-        picks = userinv['picks']
-
-        embed.add_field(name=f':lemon: Lemon x {lemons}', value='\u200B', inline=False)
-        embed.add_field(name=f':pick: Pickaxe x {picks}', value='\u200B', inline=False)
-
-        await ctx.send(embed=embed)
-
-
-    # Rolls the slots to win lemons
-    @commands.command(name='slots', description='roco themed slot machine')
+    @commands.command(name='slots', brief='\u200B')
     async def spin_slots(self, ctx):
+        """ Roco themed slot machine
+
+        Roll the slots and win lemons
+        """
         message_parts = []
         username = ctx.message.author
         userid = str(username.id)

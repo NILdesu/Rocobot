@@ -24,7 +24,8 @@ bot = commands.Bot(command_prefix=BOT_PREFIX)
 initial_extensions = ['cogs.fun',
                       'cogs.owner',
                       'cogs.members',
-                      'cogs.lemons']
+                      'cogs.lemons',
+                      'cogs.error_handler']
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -44,10 +45,10 @@ async def on_ready():
 
 # info: displays info on the bot
 @bot.command()
-async def info(ctx):
-    embed = discord.Embed(title='Rocobot', description='A bot that most certainly tastes like lemons', color=discord.Colour.gold())
-    embed.add_field(name='Author', value='NIL & Wally')
-    await ctx.send(embed=embed)
+async def info(ctx, *args):
+        embed = discord.Embed(title='Rocobot', description='A bot that most certainly tastes like lemons', color=discord.Colour.gold())
+        embed.add_field(name='Author', value='NIL & Wally')
+        await ctx.send(embed=embed)
 
 # run bot...
 bot.run(TOKEN)

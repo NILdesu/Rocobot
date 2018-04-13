@@ -6,10 +6,10 @@ class Owner:
         self.bot = bot
 
 
-    # load: Load an extension into the bot
     @commands.command(name='load', hidden=True)
     @commands.is_owner()
     async def cog_load(self, ctx, *, cog: str):
+        """ Load a cog into the bot """
         try:
             self.bot.load_extension(cog)
         except Exception as e:
@@ -17,10 +17,10 @@ class Owner:
         else:
             await ctx.send('**`SUCCESS`**')
 
-    # unload: Unload and extension currently loaded into the bot
     @commands.command(name='unload', hidden=True)
     @commands.is_owner()
     async def cog_unload(self, ctx, *, cog: str):
+        """ Unload a cog currently loaded into the bot """
         try:
             self.bot.unload_extension(cog)
         except Exception as e:
@@ -28,10 +28,10 @@ class Owner:
         else:
             await ctx.send('**`SUCCESS`**')
 
-    # reload: unload and then load an extension
     @commands.command(name='reload', hidden=True)
     @commands.is_owner()
     async def cog_reload(self, ctx, *, cog: str):
+        """ Reload a cog currently loaded into the bot """
         try:
             self.bot.unload_extension(cog)
             self.bot.load_extension(cog)
@@ -43,6 +43,7 @@ class Owner:
     @commands.command(name='exit', hidden=True)
     @commands.is_owner()
     async def quit_bot(self, ctx):
+        """ Exit the bot and disconnect from Discord """
         await self.bot.logout()
 
 # setup the cog
