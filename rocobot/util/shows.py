@@ -25,19 +25,6 @@ def _store_shows_data(data):
     shows_data = data
     print(f'data: {text}')
 
-async def _shows_help(ctx):
-    message = '```'
-    message += 'add title\n'
-    message += 'remove title\n'
-    message += 'join title\n'
-    message += 'leave title\n'
-    message += 'invite user title\n'
-    message += 'kick user title\n'
-    message += 'recommend\n'
-    message += 'list'
-    message += '```'
-    await ctx.send(message)
-
 async def _shows_add(shows, ctx, title):
     if title in shows:
         await _show_already_added(ctx)
@@ -112,10 +99,6 @@ async def handle_command(ctx, args):
         return
 
     subcommand = args[0]
-
-    if subcommand == 'help':
-        await _shows_help(ctx)
-        return
 
     shows = _retrieve_shows_data()
 
