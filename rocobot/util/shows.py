@@ -3,10 +3,6 @@ SHOWS_DATA_LOCATION = 'data/shows.json'
 import util
 from util import io
 
-import json
-
-shows_data = {}
-
 async def _show_already_added(ctx):
     await ctx.send('That show has already been added')
 
@@ -21,12 +17,16 @@ async def _user_already_joined(ctx):
 
 def _retrieve_shows_data():
     print('retrieve_shows_data')
-    return shows_data
+
+    data = util.io.read_json(SHOWS_DATA_LOCATION)
+
+    if (data == None):
+        return {}
+
+    return data
 
 def _store_shows_data(data):
-    text = json.dumps(data)
-    shows_data = data
-    print(f'data: {text}')
+    util.io.write_json(SHOWS_DATA_LOCATION, data)
 
 async def _shows_add(shows, ctx, title):
     if title in shows:
