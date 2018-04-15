@@ -104,38 +104,38 @@ async def handle_command(ctx, args):
     shows = _retrieve_shows_data()
 
     if subcommand == 'add':
-        if len(args) < 2:
+        if len(args) != 2:
             await invalid_syntax()
             return
         title = args[1]
         await _shows_add(shows, ctx, title)
     elif subcommand == 'remove':
-        if len(args) < 2:
+        if len(args) != 2:
             await invalid_syntax()
             return
         title = args[1]
         await _shows_remove(shows, ctx, title)
     elif subcommand == 'join':
-        if len(args) < 2:
+        if len(args) != 2:
             await invalid_syntax()
             return
         title = args[1]
         await _shows_join(shows, ctx, title)
     elif subcommand == 'leave':
-        if len(args) < 2:
+        if len(args) != 2:
             await invalid_syntax()
             return
         title = args[1]
         await _shows_leave(shows, ctx, title)
     elif subcommand == 'invite':
-        if len(args) < 3:
+        if len(args) != 3:
             await invalid_syntax()
             return
         user = args[1]
         title = args[2]
         await _shows_invite(shows, ctx, user, title)
     elif subcommand == 'kick':
-        if len(args) < 3:
+        if len(args) != 3:
             await invalid_syntax()
             return
         user = args[1]
