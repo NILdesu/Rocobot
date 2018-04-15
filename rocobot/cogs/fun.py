@@ -36,12 +36,10 @@ class Fun:
         embed.set_image(url=roco)
         await ctx.send(embed=embed)
 
-    @commands.command(name='rawr', brief='\u200B')
+    @commands.command(name='rawr', brief='\u200B', usage='<lengthoarms> <lengtholegs>')
     async def print_dinosaur(self, ctx, lengthoarms: int, lengtholegs: int):
         """ Display a dinosaur with varying proportions
 
-        Attributes
-        -----------
         lengthoarms: The length of arms for the dinosaur
         lengtholegs: The length of legs for the dinosaur
         """
