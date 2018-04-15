@@ -113,47 +113,37 @@ async def handle_command(ctx, args):
 
     shows = _retrieve_shows_data()
 
-    if subcommand == 'add':
-        if len(args) != 2:
-            await invalid_syntax()
-            return
+    if subcommand == 'add' and len(args) == 2:
         title = args[1]
         await _shows_add(shows, ctx, title)
-    elif subcommand == 'remove':
-        if len(args) != 2:
-            await invalid_syntax()
-            return
+        return
+    elif subcommand == 'remove' and len(args) == 2:
         title = args[1]
         await _shows_remove(shows, ctx, title)
-    elif subcommand == 'join':
-        if len(args) != 2:
-            await invalid_syntax()
-            return
+        return
+    elif subcommand == 'join' and len(args) == 2:
         title = args[1]
         await _shows_join(shows, ctx, title)
-    elif subcommand == 'leave':
-        if len(args) != 2:
-            await invalid_syntax()
-            return
+        return
+    elif subcommand == 'leave' and len(args) == 2:
         title = args[1]
         await _shows_leave(shows, ctx, title)
-    elif subcommand == 'invite':
-        if len(args) != 3:
-            await invalid_syntax()
-            return
+        return
+    elif subcommand == 'invite' and len(args) == 3:
         user = args[1]
         title = args[2]
         await _shows_invite(shows, ctx, user, title)
-    elif subcommand == 'kick':
-        if len(args) != 3:
-            await invalid_syntax()
-            return
+        return
+    elif subcommand == 'kick' and len(args) == 3:
         user = args[1]
         title = args[2]
         await _shows_kick(shows, ctx, user, title)
-    elif subcommand == 'recommend':
+        return
+    elif subcommand == 'recommend' and len(args) == 1:
         await _shows_recommend(shows, ctx)
-    elif subcommand == 'list':
+        return
+    elif subcommand == 'list' and len(args) == 1:
         await _shows_list(shows, ctx)
+        return
     else:
         await invalid_syntax()
