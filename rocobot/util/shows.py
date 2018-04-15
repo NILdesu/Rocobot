@@ -16,6 +16,9 @@ async def _show_not_added(ctx):
 async def _user_not_joined(ctx):
     await ctx.send('This user has not yet joined the show')
 
+async def _user_already_joined(ctx):
+    await ctx.send('This user has already joined the show')
+
 def _retrieve_shows_data():
     print('retrieve_shows_data')
     return shows_data
@@ -53,7 +56,11 @@ async def _shows_invite(shows, ctx, name, title):
         await _show_not_added(ctx)
         return
 
-    shows[title]['watchers'][name].append(name)
+    if name in shows[title]['watchers']:
+        await _user_already_joined(ctx)
+        return
+
+    shows[title]['watchers'].append(name)
 
     await ctx.send(f'invite {name} {title}')
     _store_shows_data(shows)
@@ -61,8 +68,7 @@ async def _shows_invite(shows, ctx, name, title):
 async def _shows_join(shows, ctx, title):
     await ctx.send(f'join {title}')
 
-    await _shows_invite(shows, ctx, ctx.message.author.name, title)
-    _store_shows_data(shows)
+    await _shows_invite(shows, ctx, f'<@{ctx.message.author.id}>', title)
 
 async def _shows_kick(shows, ctx, name, title):
     if title not in shows:
@@ -81,8 +87,7 @@ async def _shows_kick(shows, ctx, name, title):
 
 async def _shows_leave(shows, ctx, title):
     await ctx.send(f'leave {title}')
-    await _shows_kick(shows, ctx, ctx.message.author.name, title)
-    _store_shows_data(shows)
+    await _shows_kick(shows, ctx, f'<@{ctx.message.author.id}>', title)
 
 async def _shows_recommend(shows, ctx):
     await ctx.send(f'recommend')
