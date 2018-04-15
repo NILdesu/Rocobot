@@ -35,6 +35,19 @@ class CommandErrorHandler:
             time_str = self.pretty_time(error.retry_after)
             return await ctx.send(f'You may call this command again after {time_str}')
 
+        elif isinstance(error, commands.CommandNotFound):
+            return await ctx.send(f'No such command named `&{ctx.invoked_with}`')
+
+        elif isinstance(error, commands.MissingRequiredArgument):
+            help_str = f'&{ctx.command.name} {ctx.command.usage}\n\n{ctx.command.help}\n\n'
+            await ctx.send(f'Missing required argument(s) for commmand `&{ctx.command.name}`')
+            return await ctx.send(f'```{help_str}```')
+
+        elif isinstance(error, commands.BadArgument):
+            help_str = f'&{ctx.command.name} {ctx.command.usage}\n\n{ctx.command.help}\n\n'
+            await ctx.send(f'Incorrect argument types for command `&{ctx.command.name}`')
+            return await ctx.send(f'```{help_str}```')
+
         print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 

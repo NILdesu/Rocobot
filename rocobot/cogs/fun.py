@@ -40,8 +40,6 @@ class Fun:
     async def print_dinosaur(self, ctx, lengthoarms: int, lengtholegs: int):
         """ Display a dinosaur with varying proportions
 
-        Attributes
-        -----------
         lengthoarms: The length of arms for the dinosaur
         lengtholegs: The length of legs for the dinosaur
         """
