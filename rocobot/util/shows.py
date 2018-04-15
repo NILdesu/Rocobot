@@ -3,12 +3,27 @@ SHOWS_DATA_LOCATION = 'data/shows.json'
 import util
 from util import io
 
+import json
+
+shows_data = {}
+
+async def _show_already_added(ctx):
+    await ctx.send('That show has already been added')
+
+async def _show_not_added(ctx):
+    await ctx.send('That show has not yet been added')
+
+async def _user_not_joined(ctx):
+    await ctx.send('This user has not yet joined the show')
+
 def _retrieve_shows_data():
     print('retrieve_shows_data')
-    return {}
+    return shows_data
 
 def _store_shows_data(data):
-    print('store_shows_data')
+    text = json.dumps(data)
+    shows_data = data
+    print(f'data: {text}')
 
 async def _shows_help(ctx):
     message = '```'
@@ -24,27 +39,62 @@ async def _shows_help(ctx):
     await ctx.send(message)
 
 async def _shows_add(shows, ctx, title):
+    if title in shows:
+        await _show_already_added(ctx)
+        return
+
+    shows[title] = {}
+    shows[title]['watchers'] = []
+
     await ctx.send(f'add {title}')
+
     _store_shows_data(shows)
 
 async def _shows_remove(shows, ctx, title):
+    if title not in shows:
+        await _show_not_added(ctx)
+        return
+
+    del shows[title]
+
     await ctx.send(f'remove {title}')
+
+    _store_shows_data(shows)
+
+async def _shows_invite(shows, ctx, name, title):
+    if title not in shows:
+        await _show_not_added(ctx)
+        return
+
+    shows[title]['watchers'][name].append(name)
+
+    await ctx.send(f'invite {name} {title}')
     _store_shows_data(shows)
 
 async def _shows_join(shows, ctx, title):
     await ctx.send(f'join {title}')
+
+    await _shows_invite(shows, ctx, ctx.message.author.name, title)
+    _store_shows_data(shows)
+
+async def _shows_kick(shows, ctx, name, title):
+    if title not in shows:
+        await _show_not_added(ctx)
+        return
+
+    if name not in shows[title]['watchers']:
+        await _user_not_joined(ctx)
+        return
+
+    shows[title]['watchers'].remove(name)
+
+    await ctx.send(f'kick {name} {title}')
+
     _store_shows_data(shows)
 
 async def _shows_leave(shows, ctx, title):
     await ctx.send(f'leave {title}')
-    _store_shows_data(shows)
-
-async def _shows_invite(shows, ctx, user, title):
-    await ctx.send(f'invite {user} {title}')
-    _store_shows_data(shows)
-
-async def _shows_kick(shows, ctx, user, title):
-    await ctx.send(f'kick {user} {title}')
+    await _shows_kick(shows, ctx, ctx.message.author.name, title)
     _store_shows_data(shows)
 
 async def _shows_recommend(shows, ctx):
@@ -58,7 +108,7 @@ async def handle_command(ctx, args):
         await ctx.send('Invalid syntax')
 
     if len(args) < 1:
-        await invalid_syntax()
+        await invalid_syntax(ctx)
         return
 
     subcommand = args[0]
