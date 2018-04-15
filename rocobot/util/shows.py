@@ -89,7 +89,17 @@ async def _shows_recommend(shows, ctx):
     await ctx.send(f'recommend')
 
 async def _shows_list(shows, ctx):
-    await ctx.send(f'list')
+    if (len(shows) == 0):
+        await ctx.send("No shows have been added yet. Add some shows!")
+        return
+
+    message_parts = []
+    i = 0
+    for title in shows:
+        i += 1
+        message_parts.append(f'{i}. "{title}"')
+
+    await ctx.send('\n'.join(message_parts))
 
 async def handle_command(ctx, args):
     async def invalid_syntax():
@@ -145,3 +155,5 @@ async def handle_command(ctx, args):
         await _shows_recommend(shows, ctx)
     elif subcommand == 'list':
         await _shows_list(shows, ctx)
+    else:
+        await invalid_syntax()
