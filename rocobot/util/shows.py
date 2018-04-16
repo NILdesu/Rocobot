@@ -106,7 +106,7 @@ async def handle_command(ctx, args):
         await ctx.send('Invalid syntax')
 
     if len(args) < 1:
-        await invalid_syntax(ctx)
+        await invalid_syntax()
         return
 
     subcommand = args[0]
