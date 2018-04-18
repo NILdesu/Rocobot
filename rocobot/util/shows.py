@@ -86,7 +86,35 @@ async def _shows_leave(shows, ctx, title):
     await _shows_kick(shows, ctx, f'<@{ctx.message.author.id}>', title)
 
 async def _shows_recommend(shows, ctx):
-    await ctx.send(f'recommend')
+    cur_channel = None
+    cur_voice = ctx.message.author.voice
+    if (cur_voice != None):
+        cur_channel = cur_voice.channel
+
+    members = []
+    if (cur_channel == None):
+        members = util.get_online_members(ctx.guild.members)
+    else:
+        members = cur_channel.members
+
+    if (len(members) == 0):
+        await ctx.send('No members in voice chat or online.')
+        await _shows_list(shows, ctx)
+        return
+
+    points = {}
+    cur_title = ''
+    max_points = 0
+    for title in shows:
+        points[title] = 0
+        for member in members:
+            if f'<@{member.id}>' in shows[title]['watchers']:
+                points[title] += 1
+        if (points[title] > max_points):
+            cur_title = title
+            max_points = points[title]
+
+    await ctx.send(f'You should watch: {cur_title}')
 
 async def _shows_list(shows, ctx):
     if (len(shows) == 0):
